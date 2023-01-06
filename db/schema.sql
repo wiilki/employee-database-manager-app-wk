@@ -1,7 +1,7 @@
-DROP DATABASE IF EXISTS books_db;
-CREATE DATABASE books_db;
+DROP DATABASE IF EXISTS staff_db;
+CREATE DATABASE staff_db;
 
-USE books_db;
+USE staff_db;
 
 CREATE TABLE department (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
