@@ -3,6 +3,7 @@ const department = require('./lib/department');
 const employee = require('./lib/employee');
 const role = require('./lib/role');
 
+// Main menu prompt
 const mainMenu = [
     {
         type: 'list',
@@ -12,6 +13,7 @@ const mainMenu = [
     }
 ];
 
+// Call prompt
 function start() {
     return userResponses = inquirer.prompt(mainMenu);
 }
