@@ -5,4 +5,4 @@ SELECT * FROM department;
 SELECT role.id, role.title, department.name AS department, role.salary FROM role JOIN department ON role.department_id = department.id;
 
 -- VIEW EMPLOYEES
-SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, employee.manager_id AS manager FROM employee INNER JOIN role ON employee.id = role.id INNER JOIN department ON role.department_id = department.id;
+SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager FROM employee e LEFT JOIN role r ON e.role_id = r.id LEFT JOIN department d ON d.id = r.department_id LEFT JOIN employee m ON m.id = e.manager_id;
