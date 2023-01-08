@@ -18,7 +18,7 @@ function init() {
 
 init()
     .then(userInput  => {
-        return action(userInput.actions); 
+      return action(userInput.actions); 
     })
     .catch(err => {
         console.log(err);
