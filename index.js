@@ -17,6 +17,9 @@ function init() {
 }
 
 init()
-.then(selection => {
-    return action(selection)
-})
+    .then(userInput  => {
+        return action(userInput.actions); 
+    })
+    .catch(err => {
+        console.log(err);
+    })
