@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const consoleTable = require('console.table');
+const action = require('./lib/action');
 
 const mainMenu = [
     {
@@ -16,3 +17,6 @@ function init() {
 }
 
 init()
+.then(selection => {
+    return action(selection)
+})
