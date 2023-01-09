@@ -128,8 +128,46 @@ function addRole(actions) {
 
 // Add employee prompt
 function addEmployee(userInput) {
-    console.log('ADD EMPLOYEE');
-    start();
+    connection.query('SELECT * FROM role', function (err, results) {
+        let array = results;
+        inquirer
+            .prompt([
+                {
+                    type: 'input',
+                    name: 'first_name',
+                    message: "What is the employee's first name?",
+                },
+                {
+                    type: 'input',
+                    name: 'last_name',
+                    message: "What is the employee's last name?",
+                },
+                {
+                    type: 'list',
+                    name: 'role',
+                    message: "What is the employee's role?",
+                    // Return id and name values from departent selected
+                    choices: array.map((role) => {
+                        return {
+                            name: role.title,
+                            value: role.id
+                        }
+                    })
+                },
+                {
+                    type: 'list',
+                    name: 'manager',
+                    message: "Who is the employee's manager",
+                    // Return id and name values from departent selected
+                    choices: ['Manager1', 'Manager2', 'Manager3']
+                }
+            ])
+            .then((response) => {
+                connection.query(`INSERT INTO role (id, title, salary, department_id) VALUES (0, '${response.title}', '${response.salary}', '${response.department}');`, function (err, results) { });
+                connection.query('SELECT * FROM department;', function (err, results) { });
+                start();
+            });
+    })
 };
 
 // Add employee role prompt
