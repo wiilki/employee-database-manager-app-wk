@@ -131,12 +131,13 @@ function addEmployee(userInput) {
     connection.query('SELECT * FROM role', function (err, results) {
         const roles = results;
         connection.query('SELECT manager_id from employee', function (err, results) {
-           const managerID = results;
-           
-           for (i = 0; i < managerID.length; i++) {
-           if (managerID[i] !== null);           
-            console.log(managerID[i].manager_id)
-           }
+            const managerID = results;
+
+            for (i = 0; i < managerID.length; i++) {
+                if (managerID[i].manager_id !== null) {
+                    console.log(managerID[i].manager_id)
+                }
+            }
 
 
 
@@ -169,7 +170,7 @@ function addEmployee(userInput) {
                         name: 'manager',
                         message: "Who is the employee's manager",
                         // Return id and name values from departent selected
-                           choices: managerID.map((employee) => {
+                        choices: managerID.map((employee) => {
                             return {
                                 name: employee.first_name + employee.last_name,
                                 value: employee.id
