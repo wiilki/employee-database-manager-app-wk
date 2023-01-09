@@ -1,5 +1,6 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
+const promise = require('mysql2/promise');
 const consoleTable = require('console.table');
 
 const connection = mysql.createConnection(
@@ -27,37 +28,44 @@ function start() {
     return userResponses = inquirer.prompt(mainMenu);
 }
 
-function department(actions) {
+// View all departments
+function viewDepartments(actions) {
     connection.query('SELECT * FROM department;', function (err, results) {
-        // View all departments
-        if (`${actions}` === 'View All Departments') {
-            console.table(results);
-            // New department prompt
-        } else if (`${actions}` === 'Add Department') {
-            inquirer
-                .prompt([
-                    {
-                        type: 'input',
-                        name: 'name',
-                        message: 'What is the name of the department?',
-                    }
-                ])
-                .then((response) => {
-                    connection.query(`INSERT INTO department (id, name) VALUES (0, '${response.name}');`, function (err, results) {
-                    });
-                    connection.query('SELECT * FROM department;', function (err, results) {
-                        console.table(results);
-                    });
-                });
-        };
+        console.table(results);
     });
 }
 
-function role(actions) {
+// New department prompt
+function addDepartment(actions) {
+    inquirer
+        .prompt([
+            {
+                type: 'input',
+                name: 'name',
+                message: 'What is the name of the department?',
+            }
+        ])
+        .then((response) => {
+            connection.query(`INSERT INTO department (id, name) VALUES (0, '${response.name}');`, function (err, results) {
+            });
+            connection.query('SELECT * FROM department;', function (err, results) {
+                console.table(results);
+            });
+        });
+};
+
+// View all roles
+function viewRoles(actions) {
     connection.query('SELECT r.id, r.title, d.name AS department, r.salary FROM role r JOIN department d ON r.department_id = d.id;', function (err, results) {
-        if (`${actions}` === 'View All Roles') {
-            console.table(results);
-        } else if (`${actions}` === 'Add Role') {
+        console.table(results);
+    })
+};
+
+// New role prompt
+function addRole(actions) {
+    async function addRole() {
+        const connection = await connection.query({ sql: 'SELECT name FROM department', rowsAsArray: true }, function (err, results, fields) {
+            let array = results;
             inquirer
                 .prompt([
                     {
@@ -74,31 +82,34 @@ function role(actions) {
                         type: 'list',
                         name: 'department',
                         message: 'What department does the role belong to?',
-                        choices: []
+                        choices: array,
                     }
                 ])
-                .then((response) => {
-                    connection.query(`INSERT INTO department (id, name) VALUES (0, '${response.department}');`, function (err, results) {
-                    });
-                    connection.query('SELECT * FROM department;', function (err, results) {
-                        console.table(results);
-                    });
+        })
+            .then((response) => {
+                connection.query(`INSERT INTO department (id, name) VALUES (0, '${response.department}');`, function (err, results) {
                 });
-        };
-    });
+                connection.query('SELECT * FROM department;', function (err, results) {
+                    console.table(results);
+                });
+            });
+    };
+    addRole();
 };
 
-function employee(userInput) {
+function viewEmployee(userInput) {
     connection.query("SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager FROM employee e LEFT JOIN role r ON e.role_id = r.id LEFT JOIN department d ON d.id = r.department_id LEFT JOIN employee m ON m.id = e.manager_id;", function (err, results) {
-        if (`${userInput}` === 'View All Employees') {
-            console.table(results);
-        } else if (`${userInput}` === 'Add Employee') {
-            console.log('ADD EMPLOYEE');
-        } else if (`${userInput}` === 'Update Employee Role') {
-            console.log('UPDATE EMPLOYEE ROLE');
-        }
-    });
-}
+        console.table(results);
+    })
+};
+
+function addEmployee(userInput) {
+    console.log('ADD EMPLOYEE');
+};
+
+function updateEmployee(userInput) {
+    console.log('UPDATE EMPLOYEE ROLE');
+};
 
 start()
     .then(mainMenu => {
