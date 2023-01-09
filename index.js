@@ -25,7 +25,7 @@ function start() {
         ])
         .then(response => {
             if (response.actions === 'View All Employees') {
-                return viewEmployees();
+                return viewEmployees(response);
             } else if (response.actions === 'Add Employee') {
                 return addEmployee(response);
             } else if (response.actions === 'Update Employee Role') {
@@ -49,24 +49,25 @@ function start() {
 function viewDepartments(actions) {
     connection.query('SELECT * FROM department;', function (err, results) {
         console.table(results);
+        start();
     });
-    start();
+
 }
 
 // View all roles
 function viewRoles(actions) {
     connection.query('SELECT r.id, r.title, d.name AS department, r.salary FROM role r JOIN department d ON r.department_id = d.id;', function (err, results) {
         console.table(results);
+        start();
     })
-    start();
 };
 
 // View all employees
 function viewEmployees(userInput) {
     connection.query("SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager FROM employee e LEFT JOIN role r ON e.role_id = r.id LEFT JOIN department d ON d.id = r.department_id LEFT JOIN employee m ON m.id = e.manager_id;", function (err, results) {
         console.table(results);
+        start();
     })
-    start();
 };
 
 // New department prompt
@@ -85,8 +86,9 @@ function addDepartment(actions) {
             connection.query('SELECT * FROM department;', function (err, results) {
                 console.table(results);
             });
+            start();
         });
-    start();
+
 };
 
 // Add role prompt
@@ -125,8 +127,9 @@ function addRole(actions) {
                     console.table(results);
                 });
             });
+        start();
     })
-    start();
+
 };
 
 // Add employee prompt
