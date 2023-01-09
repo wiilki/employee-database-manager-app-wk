@@ -68,33 +68,29 @@ function addDepartment(actions) {
         });
 };
 
-
-
-// New role prompt
+// Add role prompt
 function addRole(actions) {
-    async function addRole() {
-        const connection = await connection.query({ sql: 'SELECT name FROM department', rowsAsArray: true }, function (err, results, fields) {
-            let array = results;
-            inquirer
-                .prompt([
-                    {
-                        type: 'input',
-                        name: 'name',
-                        message: 'What is the name of the role?',
-                    },
-                    {
-                        type: 'input',
-                        name: 'salary',
-                        message: 'What is the salary of the role?',
-                    },
-                    {
-                        type: 'list',
-                        name: 'department',
-                        message: 'What department does the role belong to?',
-                        choices: array,
-                    }
-                ])
-        })
+    connection.query({ sql: 'SELECT name FROM department', rowsAsArray: true }, function (err, results, fields) {
+        let array = results;
+        inquirer
+            .prompt([
+                {
+                    type: 'input',
+                    name: 'name',
+                    message: 'What is the name of the role?',
+                },
+                {
+                    type: 'input',
+                    name: 'salary',
+                    message: 'What is the salary of the role?',
+                },
+                {
+                    type: 'list',
+                    name: 'department',
+                    message: 'What department does the role belong to?',
+                    choices: array,
+                }
+            ])
             .then((response) => {
                 connection.query(`INSERT INTO department (id, name) VALUES (0, '${response.department}');`, function (err, results) {
                 });
@@ -102,10 +98,8 @@ function addRole(actions) {
                     console.table(results);
                 });
             });
-    };
-    addRole();
+    })
 };
-
 
 // Add employee prompt
 function addEmployee(userInput) {
