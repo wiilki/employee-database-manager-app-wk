@@ -35,6 +35,20 @@ function viewDepartments(actions) {
     });
 }
 
+// View all roles
+function viewRoles(actions) {
+    connection.query('SELECT r.id, r.title, d.name AS department, r.salary FROM role r JOIN department d ON r.department_id = d.id;', function (err, results) {
+        console.table(results);
+    })
+};
+
+// View all employees
+function viewEmployees(userInput) {
+    connection.query("SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager FROM employee e LEFT JOIN role r ON e.role_id = r.id LEFT JOIN department d ON d.id = r.department_id LEFT JOIN employee m ON m.id = e.manager_id;", function (err, results) {
+        console.table(results);
+    })
+};
+
 // New department prompt
 function addDepartment(actions) {
     inquirer
@@ -54,12 +68,7 @@ function addDepartment(actions) {
         });
 };
 
-// View all roles
-function viewRoles(actions) {
-    connection.query('SELECT r.id, r.title, d.name AS department, r.salary FROM role r JOIN department d ON r.department_id = d.id;', function (err, results) {
-        console.table(results);
-    })
-};
+
 
 // New role prompt
 function addRole(actions) {
@@ -97,17 +106,14 @@ function addRole(actions) {
     addRole();
 };
 
-function viewEmployees(userInput) {
-    connection.query("SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager FROM employee e LEFT JOIN role r ON e.role_id = r.id LEFT JOIN department d ON d.id = r.department_id LEFT JOIN employee m ON m.id = e.manager_id;", function (err, results) {
-        console.table(results);
-    })
-};
 
+// Add employee prompt
 function addEmployee(userInput) {
     console.log('ADD EMPLOYEE');
 };
 
-function updateEmployee(userInput) {
+// Add employee role prompt
+function updateRole(userInput) {
     console.log('UPDATE EMPLOYEE ROLE');
 };
 
@@ -118,7 +124,7 @@ start()
         } else if (mainMenu.actions === 'Add Employee') {
             return addEmployee(mainMenu.actions);
         } else if (mainMenu.actions === 'Update Employee Role') {
-            return updateEmployee(mainMenu.actions);
+            return updateRole(mainMenu.actions);
         } else if (mainMenu.actions === 'View All Roles') {
             return viewRoles(mainMenu.actions);
         } else if (mainMenu.actions === 'Add Role') {
