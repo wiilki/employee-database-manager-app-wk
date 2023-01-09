@@ -70,13 +70,14 @@ function addDepartment(actions) {
 
 // Add role prompt
 function addRole(actions) {
-    connection.query({ sql: 'SELECT name FROM department', rowsAsArray: true }, function (err, results, fields) {
+    connection.query('SELECT * FROM department', function (err, results) {
         let array = results;
+
         inquirer
             .prompt([
                 {
                     type: 'input',
-                    name: 'name',
+                    name: 'title',
                     message: 'What is the name of the role?',
                 },
                 {
@@ -92,7 +93,7 @@ function addRole(actions) {
                 }
             ])
             .then((response) => {
-                connection.query(`INSERT INTO department (id, name) VALUES (0, '${response.department}');`, function (err, results) {
+                connection.query(`INSERT INTO role (id, title, salary, department_id) VALUES (0, '${response.title}', '${response.salary}', response.department.id);`, function (err, results) {
                 });
                 connection.query('SELECT * FROM department;', function (err, results) {
                     console.table(results);
