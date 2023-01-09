@@ -81,11 +81,8 @@ function addDepartment(actions) {
             }
         ])
         .then((response) => {
-            connection.query(`INSERT INTO department (id, name) VALUES (0, '${response.name}');`, function (err, results) {
-            });
-            connection.query('SELECT * FROM department;', function (err, results) {
-                console.table(results);
-            });
+            connection.query(`INSERT INTO department (id, name) VALUES (0, '${response.name}');`, function (err, results) { });
+            connection.query('SELECT * FROM department;', function (err, results) { });
             start();
         });
 
@@ -121,13 +118,10 @@ function addRole(actions) {
                 }
             ])
             .then((response) => {
-                connection.query(`INSERT INTO role (id, title, salary, department_id) VALUES (0, '${response.title}', '${response.salary}', '${response.department}');`, function (err, results) {
-                });
-                connection.query('SELECT * FROM department;', function (err, results) {
-                    console.table(results);
-                });
+                connection.query(`INSERT INTO role (id, title, salary, department_id) VALUES (0, '${response.title}', '${response.salary}', '${response.department}');`, function (err, results) { });
+                connection.query('SELECT * FROM department;', function (err, results) { });
+                start();
             });
-        start();
     })
 
 };
