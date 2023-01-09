@@ -89,11 +89,16 @@ function addRole(actions) {
                     type: 'list',
                     name: 'department',
                     message: 'What department does the role belong to?',
-                    choices: array,
+                    choices: array.map((department) => {
+                    return {
+                        name: department.name,
+                        value: department.id
+                    }
+                }),
                 }
             ])
             .then((response) => {
-                connection.query(`INSERT INTO role (id, title, salary, department_id) VALUES (0, '${response.title}', '${response.salary}', response.department.id);`, function (err, results) {
+                connection.query(`INSERT INTO role (id, title, salary, department_id) VALUES (0, '${response.title}', '${response.salary}', '${response.department}');`, function (err, results) {
                 });
                 connection.query('SELECT * FROM department;', function (err, results) {
                     console.table(results);
