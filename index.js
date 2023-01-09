@@ -97,7 +97,7 @@ function addRole(actions) {
     addRole();
 };
 
-function viewEmployee(userInput) {
+function viewEmployees(userInput) {
     connection.query("SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager FROM employee e LEFT JOIN role r ON e.role_id = r.id LEFT JOIN department d ON d.id = r.department_id LEFT JOIN employee m ON m.id = e.manager_id;", function (err, results) {
         console.table(results);
     })
@@ -113,12 +113,20 @@ function updateEmployee(userInput) {
 
 start()
     .then(mainMenu => {
-        if (mainMenu.actions === 'View All Employees' || mainMenu.actions === 'Add Employee' || mainMenu.actions === 'Update Employee Role') {
-            return employee(mainMenu.actions);
-        } else if (mainMenu.actions === 'View All Roles' || mainMenu.actions === 'Add Role') {
-            return role(mainMenu.actions);
-        } else if (mainMenu.actions === 'View All Departments' || mainMenu.actions === 'Add Department') {
-            return department(mainMenu.actions);
+        if (mainMenu.actions === 'View All Employees') {
+            return viewEmployees(mainMenu.actions);
+        } else if (mainMenu.actions === 'Add Employee') {
+            return addEmployee(mainMenu.actions);
+        } else if (mainMenu.actions === 'Update Employee Role') {
+            return updateEmployee(mainMenu.actions);
+        } else if (mainMenu.actions === 'View All Roles') {
+            return viewRoles(mainMenu.actions);
+        } else if (mainMenu.actions === 'Add Role') {
+            return addRole(mainMenu.actions);
+        } else if (mainMenu.actions === 'View All Departments') {
+            return viewDepartments(mainMenu.actions);
+        } else if (mainMenu.actions === 'Add Department') {
+            return addDepartment(mainMenu.actions);
         };
     })
     .catch(err => {
