@@ -84,12 +84,12 @@ function addRole() {
 
 // Add employee prompt
 function addEmployee() {
-    connection.query('SELECT * FROM role', function (err, results) {
 
+    connection.query('SELECT * FROM role', function (err, results) {
         // Returns all roles to an array
         const roles = results.map(role => ({ name: role.title, value: role.id }));
-        connection.query(`SELECT * FROM employee;`, function (err, results) {
 
+        connection.query(`SELECT * FROM employee;`, function (err, results) {
             // Returns all employees to an array
             const employee = results.map(employee => ({ name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
 
@@ -137,7 +137,36 @@ function addEmployee() {
 // Add employee role prompt
 function updateRole() {
     console.log('UPDATE EMPLOYEE ROLE');
-    start();
+
+    connection.query('SELECT * FROM employee', function (err, results) {
+        // Returns all departments to an array
+        const employees = results.map(employee => ({ name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
+
+        connection.query('SELECT * FROM role', function (err, results) {
+            // Returns all roles to an array
+            const roles = results.map(role => ({ name: role.title, value: role.id }));
+
+            inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'employee',
+                    message: "Which employee's role do you want to update?",
+                    choices: employees
+                },
+                {
+                    type: 'list',
+                    name: 'role',
+                    message: "Which role do you want to assign the selected employee?",
+                    choices: roles
+                }
+            ])
+                .then((response) => {
+                    console.log(response)
+                    connection.query(`UPDATE employee SET role_id = '${response.role}' WHERE id = ${response.employee};`, function (err, results) { });
+                    start();
+                });
+        });
+    })
 };
 
 function start() {
