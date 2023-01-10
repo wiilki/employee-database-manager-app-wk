@@ -222,6 +222,37 @@ function updateManager() {
     });
 };
 
+function deleteDepartment() {
+
+    connection.query('SELECT * FROM department', function (err, results) {
+       // Returns all departments to an array
+        const departments = results.map(department => ({ name: department.name, value: department.id }));
+       
+        // Adds "Cancel" to department selection
+        results.push('Cancel');
+
+        inquirer.prompt([
+            {
+                type: 'list',
+                name: 'department',
+                message: "Which department do you want to delete?",
+                // Returns all values from department table
+                choices: departments
+            }
+        ])
+            .then((response) => {
+                switch (response.department) {
+                    case 'Cancel':
+                        break;
+                    default:
+                        connection.query(`DELETE FROM department WHERE id = ${response.department};`, function (err, results) { });
+                }
+                start();
+            });
+    });
+};
+
+// Delete employee prompt
 function deleteEmployee() {
 
     connection.query('SELECT * FROM employee', function (err, results) {
@@ -243,7 +274,6 @@ function deleteEmployee() {
             .then((response) => {
                 switch (response.employee) {
                     case 'Cancel':
-                        updateEmployee();
                         break;
                     default:
                         connection.query(`DELETE FROM employee WHERE id = ${response.employee};`, function (err, results) { });
@@ -294,7 +324,7 @@ function start() {
             type: 'list',
             name: 'actions',
             message: 'What would you like to do?',
-            choices: ['View All Employees', 'Add Employee', 'Update Employee', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Quit']
+            choices: ['View All Employees', 'Add Employee', 'Update Employee', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Delete Department', 'Quit']
         }
     ])
         .then(response => {
@@ -319,6 +349,9 @@ function start() {
                     break;
                 case 'Add Department':
                     return addDepartment(response);
+                    break;
+                case 'Delete Department':
+                    return deleteDepartment(response);
                     break;
                 case 'None':
                     process.exit();
