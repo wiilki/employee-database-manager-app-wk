@@ -58,4 +58,3 @@ VALUES
         '${response.manager}'
     );
 
-    
