@@ -55,7 +55,8 @@ function addDepartment() {
 // Add role prompt
 function addRole() {
     connection.query('SELECT * FROM department', function (err, results) {
-        let array = results;
+
+        const departments = results.map(department => ({ name: department.name, value: department.id }));
 
         inquirer.prompt([
             {
@@ -72,12 +73,7 @@ function addRole() {
                 type: 'list',
                 name: 'department',
                 message: 'What department does the role belong to?',
-                choices: array.map((department) => {
-                    return {
-                        name: department.name,
-                        value: department.id
-                    }
-                }),
+                choices: departments
             }
         ])
             .then((response) => {
@@ -91,24 +87,12 @@ function addRole() {
 // Add employee prompt
 function addEmployee() {
     connection.query('SELECT * FROM role', function (err, results) {
-        const roles = results;
-        connection.query(`SELECT first_name FROM employee e LEFT JOIN employee m ON m.id = e.manager_id;`, function (err, results) {
-            const managerID = results;
-            console.log(managerID)
 
+        const roles = results.map(role => ({ name: role.title, value: role.id }));
 
+        connection.query(`SELECT * FROM employee;`, function (err, results) {
 
-
-            function findManager() {
-                for (i = 0; i < managerID.length; i++) {
-                    if (managerID[i].manager_id !== null) {
-                        console.log(managerID[i].manager_id);
-                    }
-
-                }
-            }
-
-
+            const employee = results.map(employee => ({ name: employee.first_name + ' ' + employee.last_name, value: employee.employee_id }));
 
             inquirer.prompt([
                 {
@@ -126,19 +110,14 @@ function addEmployee() {
                     name: 'role',
                     message: "What is the employee's role?",
                     // Return id and name values from departent selected
-                    choices: roles.map((role) => {
-                        return {
-                            name: role.title,
-                            value: role.id
-                        }
-                    })
+                    choices: roles
                 },
                 {
                     type: 'list',
                     name: 'manager',
                     message: "Who is the employee's manager",
                     // Return id and name values from departent selected
-                    choices: []
+                    choices: employee
                 }
             ])
                 .then((response) => {
