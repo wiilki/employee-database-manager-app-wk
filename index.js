@@ -13,38 +13,6 @@ const connection = mysql.createConnection(
     console.log(`Connected to the staff_db database.`)
 );
 
-function start() {
-    inquirer
-        .prompt([
-            {
-                type: 'list',
-                name: 'actions',
-                message: 'What would you like to do?',
-                choices: ['View All Employees', 'Add Employee', 'Update Employee Role', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department']
-            }
-        ])
-        .then(response => {
-            if (response.actions === 'View All Employees') {
-                return viewEmployees(response);
-            } else if (response.actions === 'Add Employee') {
-                return addEmployee(response);
-            } else if (response.actions === 'Update Employee Role') {
-                return updateRole(response);
-            } else if (response.actions === 'View All Roles') {
-                return viewRoles(response);
-            } else if (response.actions === 'Add Role') {
-                return addRole(response);
-            } else if (response.actions === 'View All Departments') {
-                return viewDepartments(response);
-            } else if (response.actions === 'Add Department') {
-                return addDepartment(response);
-            };
-        })
-        .catch(err => {
-            console.log(err);
-        })
-}
-
 // View all departments
 function viewDepartments(actions) {
     connection.query('SELECT * FROM department;', function (err, results) {
@@ -194,5 +162,37 @@ function updateRole(userInput) {
     console.log('UPDATE EMPLOYEE ROLE');
     start();
 };
+
+function start() {
+    inquirer
+        .prompt([
+            {
+                type: 'list',
+                name: 'actions',
+                message: 'What would you like to do?',
+                choices: ['View All Employees', 'Add Employee', 'Update Employee Role', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department']
+            }
+        ])
+        .then(response => {
+            if (response.actions === 'View All Employees') {
+                return viewEmployees(response);
+            } else if (response.actions === 'Add Employee') {
+                return addEmployee(response);
+            } else if (response.actions === 'Update Employee Role') {
+                return updateRole(response);
+            } else if (response.actions === 'View All Roles') {
+                return viewRoles(response);
+            } else if (response.actions === 'Add Role') {
+                return addRole(response);
+            } else if (response.actions === 'View All Departments') {
+                return viewDepartments(response);
+            } else if (response.actions === 'Add Department') {
+                return addDepartment(response);
+            };
+        })
+        .catch(err => {
+            console.log(err);
+        })
+}
 
 start()
