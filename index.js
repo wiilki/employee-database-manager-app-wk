@@ -90,10 +90,10 @@ function addEmployee() {
 
         connection.query(`SELECT * FROM employee;`, function (err, results) {
             // Returns all employees to an array
-            const employee = results.map(employee => ({ name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
+            const employees = results.map(employee => ({ name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
 
             // Adds "None" to top of manager selection
-            employee.unshift('None');
+            employees.unshift('None');
 
             inquirer.prompt([
                 {
@@ -138,7 +138,6 @@ function addEmployee() {
 
 // Update employee role prompt
 function updateRole() {
-    console.log('UPDATE EMPLOYEE ROLE');
 
     connection.query('SELECT * FROM employee', function (err, results) {
         // Returns all employees to an array
@@ -170,13 +169,52 @@ function updateRole() {
     })
 };
 
+// Update employee manager prompt
+function updateManager() {
+
+    connection.query('SELECT * FROM employee', function (err, results) {
+        // Returns all employees to an array
+        const employees = results.map(employee => ({ name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
+
+        // Adds "None" to top of manager selection
+        employees.unshift('None');
+
+        inquirer.prompt([
+            {
+                type: 'list',
+                name: 'employee',
+                message: "Which employee's role do you want to update?",
+                // Return id and name values from employee table
+                choices: employees
+            },
+            {
+                type: 'list',
+                name: 'manager',
+                message: "Who is the employee's manager",
+                // Return id and name values from employee table
+                choices: employees
+            }
+        ])
+            .then((response) => {
+                switch (response.manager) {
+                    case 'None':
+                        connection.query(`UPDATE employee SET manager_id = null WHERE id = ${response.employee};`, function (err, results) { });
+                        break;
+                    default:
+                        connection.query(`UPDATE employee SET manager_id = '${response.manager}' WHERE id = ${response.employee};`, function (err, results) { });
+                }
+                start();
+            });
+    })
+}
+
 function start() {
     inquirer.prompt([
         {
             type: 'list',
             name: 'actions',
             message: 'What would you like to do?',
-            choices: ['View All Employees', 'Add Employee', 'Update Employee Role', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Quit']
+            choices: ['View All Employees', 'Add Employee', 'Update Employee Role', 'Update Employee Manager', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Quit']
         }
     ])
         .then(response => {
@@ -189,6 +227,9 @@ function start() {
                     break;
                 case 'Update Employee Role':
                     return updateRole(response);
+                    break;
+                case 'Update Employee Manager':
+                    return updateManager(response);
                     break;
                 case 'View All Roles':
                     return viewRoles(response);
