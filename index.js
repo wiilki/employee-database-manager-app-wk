@@ -163,7 +163,7 @@ function updateRole() {
             ])
                 .then((response) => {
                     connection.query(`UPDATE employee SET role_id = '${response.role}' WHERE id = ${response.employee};`, function (err, results) { });
-                    start();
+                    updateEmployee()
                 });
         });
     })
@@ -203,7 +203,7 @@ function updateManager() {
                     default:
                         connection.query(`UPDATE employee SET manager_id = '${response.manager}' WHERE id = ${response.employee};`, function (err, results) { });
                 }
-                start();
+                updateEmployee()
             });
     });
 };
@@ -215,13 +215,38 @@ function viewByManager() {
     });
 };
 
+function updateEmployee() {
+    inquirer.prompt([
+        {
+            type: 'list',
+            name: 'actions',
+            message: 'What would you like to do?',
+            choices: ['Update Employee Role', 'Update Employee Manager', 'Go Back']
+        }
+    ]).then(response => {
+        switch (response.actions) {
+            case 'Update Employee Role':
+                return updateRole(response);
+                break;
+            case 'Update Employee Manager':
+                return updateManager(response);
+                break;
+            case 'Go Back':
+                return start();
+        };
+    })
+        .catch(err => {
+            console.log(err);
+        })
+}
+
 function start() {
     inquirer.prompt([
         {
             type: 'list',
             name: 'actions',
             message: 'What would you like to do?',
-            choices: ['View All Employees', 'Add Employee', 'Update Employee Role', 'Update Employee Manager', , 'View By Manager', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Quit']
+            choices: ['View All Employees', 'View By Manager', 'Add Employee', 'Update Employee', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Quit']
         }
     ])
         .then(response => {
@@ -229,17 +254,14 @@ function start() {
                 case 'View All Employees':
                     return viewEmployees(response);
                     break;
-                case 'Add Employee':
-                    return addEmployee(response);
-                    break;
-                case 'Update Employee Role':
-                    return updateRole(response);
-                    break;
                 case 'View By Manager':
                     return viewByManager(response);
                     break;
-                case 'Update Employee Manager':
-                    return updateManager(response);
+                case 'Add Employee':
+                    return addEmployee(response);
+                    break;
+                case 'Update Employee':
+                    return updateEmployee(response);
                     break;
                 case 'View All Roles':
                     return viewRoles(response);
