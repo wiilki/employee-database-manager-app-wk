@@ -35,6 +35,7 @@ function viewEmployees() {
     });
 };
 
+// View employee's by managers
 function viewByManager() {
     connection.query("SELECT CONCAT(m.first_name, ' ', m.last_name) AS manager, e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary FROM employee e LEFT JOIN role r ON e.role_id = r.id LEFT JOIN department d ON d.id = r.department_id LEFT JOIN employee m ON m.id = e.manager_id WHERE e.manager_id IS NOT NULL ORDER BY e.manager_id;", function (err, results) {
         console.table(results);
@@ -42,6 +43,7 @@ function viewByManager() {
     });
 };
 
+// View employee's by departments
 function viewByDepartment() {
     connection.query("SELECT d.name AS department, e.id, e.first_name, e.last_name, r.title, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager FROM employee e LEFT JOIN role r ON e.role_id = r.id LEFT JOIN department d ON d.id = r.department_id LEFT JOIN employee m ON m.id = e.manager_id;", function (err, results) {
         console.table(results);
@@ -64,7 +66,7 @@ function addDepartment() {
         });
 };
 
-// Add role prompt
+// New role prompt
 function addRole() {
     connection.query('SELECT * FROM department', function (err, results) {
         // Returns all departments to an array
@@ -191,7 +193,8 @@ function updateManager() {
         const employees = results.map(employee => ({ name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
 
         // Adds "None" to top of manager selection
-        employees.unshift('None');
+        const managers = results.map(employee => ({ name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
+        managers.unshift('None');
 
         inquirer.prompt([
             {
@@ -206,10 +209,14 @@ function updateManager() {
                 name: 'manager',
                 message: "Who is the employee's manager",
                 // Return id and name values from employee table
-                choices: employees
+                choices: managers
             }
         ])
             .then((response) => {
+                switch (response.employee) {
+                    case 'None':
+                        break;
+                };
                 switch (response.manager) {
                     case 'None':
                         connection.query(`UPDATE employee SET manager_id = null WHERE id = ${response.employee};`, function (err, results) { });
@@ -222,13 +229,14 @@ function updateManager() {
     });
 };
 
+// Delete department prompt
 function deleteDepartment() {
 
     connection.query('SELECT * FROM department', function (err, results) {
-       // Returns all departments to an array
+        // Returns all departments to an array
         const departments = results.map(department => ({ name: department.name, value: department.id }));
-       
-        // Adds "Cancel" to department selection
+
+        // Adds "Cancel" option to department selection
         results.push('Cancel');
 
         inquirer.prompt([
@@ -252,6 +260,37 @@ function deleteDepartment() {
     });
 };
 
+// Delete role prompt
+function deleteRole() {
+
+    connection.query('SELECT * FROM role', function (err, results) {
+        // Returns all departments to an array
+        const roles = results.map(role => ({ name: role.title, value: role.id }));
+
+        // Adds "Cancel" option to role selection
+        results.push('Cancel');
+
+        inquirer.prompt([
+            {
+                type: 'list',
+                name: 'role',
+                message: "Which role do you want to delete?",
+                // Returns all values from department table
+                choices: roles
+            }
+        ])
+            .then((response) => {
+                switch (response.role) {
+                    case 'Cancel':
+                        break;
+                    default:
+                        connection.query(`DELETE FROM role WHERE id = ${response.role};`, function (err, results) { });
+                }
+                start();
+            });
+    });
+};
+
 // Delete employee prompt
 function deleteEmployee() {
 
@@ -259,7 +298,7 @@ function deleteEmployee() {
         // Returns all employees to an array
         const employees = results.map(employee => ({ name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
 
-        // Adds "Cancel" to employee selection
+        // Adds "Cancel" option to employee selection
         employees.push('Cancel');
 
         inquirer.prompt([
@@ -315,8 +354,8 @@ function updateEmployee() {
     })
         .catch(err => {
             console.log(err);
-        })
-}
+        });
+};
 
 function start() {
     inquirer.prompt([
@@ -324,7 +363,7 @@ function start() {
             type: 'list',
             name: 'actions',
             message: 'What would you like to do?',
-            choices: ['View All Employees', 'Add Employee', 'Update Employee', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Delete Department', 'Quit']
+            choices: ['View All Employees', 'Add Employee', 'Update Employee', 'View All Roles', 'Add Role', 'Delete Role', 'View All Departments', 'Add Department', 'Delete Department', 'Quit']
         }
     ])
         .then(response => {
@@ -344,6 +383,9 @@ function start() {
                 case 'Add Role':
                     return addRole(response);
                     break;
+                case 'Delete Role':
+                    return deleteRole(response);
+                    break;
                 case 'View All Departments':
                     return viewDepartments(response);
                     break;
@@ -359,7 +401,7 @@ function start() {
         })
         .catch(err => {
             console.log(err);
-        })
-}
+        });
+};
 
 start();
