@@ -38,14 +38,14 @@ function viewEmployees() {
 function viewByManager() {
     connection.query("SELECT CONCAT(m.first_name, ' ', m.last_name) AS manager, e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary FROM employee e LEFT JOIN role r ON e.role_id = r.id LEFT JOIN department d ON d.id = r.department_id LEFT JOIN employee m ON m.id = e.manager_id WHERE e.manager_id IS NOT NULL ORDER BY e.manager_id;", function (err, results) {
         console.table(results);
-        addEmployee();
+        updateEmployee();
     });
 };
 
 function viewByDepartment() {
     connection.query("SELECT d.name AS department, e.id, e.first_name, e.last_name, r.title, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager FROM employee e LEFT JOIN role r ON e.role_id = r.id LEFT JOIN department d ON d.id = r.department_id LEFT JOIN employee m ON m.id = e.manager_id;", function (err, results) {
         console.table(results);
-        addEmployee();
+        updateEmployee();
     });
 };
 
@@ -132,7 +132,7 @@ function addEmployee() {
                     name: 'manager',
                     message: "Who is the employee's manager",
                     // Return id and name values from employee table
-                    choices: employee
+                    choices: employees
                 }
             ])
                 .then((response) => {
@@ -222,9 +222,35 @@ function updateManager() {
     });
 };
 
-
 function deleteEmployee() {
 
+    connection.query('SELECT * FROM employee', function (err, results) {
+        // Returns all employees to an array
+        const employees = results.map(employee => ({ name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
+
+        // Adds "Cancel" to employee selection
+        employees.push('Cancel');
+
+        inquirer.prompt([
+            {
+                type: 'list',
+                name: 'employee',
+                message: "Which employee do you want to delete?",
+                // Return id and name values from employee table
+                choices: employees
+            }
+        ])
+            .then((response) => {
+                switch (response.employee) {
+                    case 'Cancel':
+                        updateEmployee();
+                        break;
+                    default:
+                        connection.query(`DELETE FROM employee WHERE id = ${response.employee};`, function (err, results) { });
+                }
+                updateEmployee();
+            });
+    });
 };
 
 function updateEmployee() {
@@ -233,7 +259,7 @@ function updateEmployee() {
             type: 'list',
             name: 'actions',
             message: 'What would you like to do?',
-            choices: ['Update Employee Role', 'Update Employee Manager', 'View Employee By Manager', 'View Employee By Department', 'Go Back']
+            choices: ['Update Employee Role', 'Update Employee Manager', 'Delete Employee', 'View Employee By Manager', 'View Employee By Department', 'Go Back']
         }
     ]).then(response => {
         switch (response.actions) {
@@ -242,6 +268,9 @@ function updateEmployee() {
                 break;
             case 'Update Employee Manager':
                 return updateManager(response);
+                break;
+            case 'Delete Employee':
+                return deleteEmployee(response);
                 break;
             case 'View Employee By Manager':
                 return viewByManager(response);
