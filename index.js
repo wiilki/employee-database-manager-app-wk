@@ -53,7 +53,6 @@ function addDepartment() {
 // Add role prompt
 function addRole() {
     connection.query('SELECT * FROM department', function (err, results) {
-
         // Returns all departments to an array
         const departments = results.map(department => ({ name: department.name, value: department.id }));
 
@@ -123,11 +122,14 @@ function addEmployee() {
                 }
             ])
                 .then((response) => {
-                    if (`${response.manager}` === "None") {
-                        connection.query(`INSERT INTO employee (id, first_name, last_name, role_id, manager_id) VALUES (0, '${response.first_name}', '${response.last_name}', '${response.role}', null);`, function (err, results) { });
-                    } else {
-                        connection.query(`INSERT INTO employee (id, first_name, last_name, role_id, manager_id) VALUES (0, '${response.first_name}', '${response.last_name}', '${response.role}', '${response.manager}');`, function (err, results) { });
-                    };
+                    switch (response.manager) {
+                        case 'None':
+                            connection.query(`INSERT INTO employee (id, first_name, last_name, role_id, manager_id) VALUES (0, '${response.first_name}', '${response.last_name}', '${response.role}', null);`, function (err, results) { });
+                            break;
+                        default:
+                            connection.query(`INSERT INTO employee (id, first_name, last_name, role_id, manager_id) VALUES (0, '${response.first_name}', '${response.last_name}', '${response.role}', '${response.manager}');`, function (err, results) { });
+                            break;
+                    }
                     start();
                 });
         });
@@ -178,23 +180,31 @@ function start() {
         }
     ])
         .then(response => {
-            if (response.actions === 'View All Employees') {
-                return viewEmployees(response);
-            } else if (response.actions === 'Add Employee') {
-                return addEmployee(response);
-            } else if (response.actions === 'Update Employee Role') {
-                return updateRole(response);
-            } else if (response.actions === 'View All Roles') {
-                return viewRoles(response);
-            } else if (response.actions === 'Add Role') {
-                return addRole(response);
-            } else if (response.actions === 'View All Departments') {
-                return viewDepartments(response);
-            } else if (response.actions === 'Add Department') {
-                return addDepartment(response);
-            } else {
-                process.exit();
-            };
+            switch (response.actions) {
+                case 'View All Employees':
+                    return viewEmployees(response);
+                    break;
+                case 'Add Employee':
+                    return addEmployee(response);
+                    break;
+                case 'Update Employee Role':
+                    return updateRole(response);
+                    break;
+                case 'View All Roles':
+                    return viewRoles(response);
+                    break;
+                case 'Add Role':
+                    return addRole(response);
+                    break;
+                case 'View All Departments':
+                    return viewDepartments(response);
+                    break;
+                case 'Add Department':
+                    return addDepartment(response);
+                    break;
+                case 'None':
+                    process.exit();
+            }
         })
         .catch(err => {
             console.log(err);
