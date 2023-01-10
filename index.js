@@ -90,9 +90,8 @@ function addEmployee() {
 
         connection.query(`SELECT * FROM employee;`, function (err, results) {
 
-            const employee = results.map(employee => ({ name: employee.first_name + ' ' + employee.last_name, value: employee.employee_id }));
+            const employee = results.map(employee => ({ name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
             employee.unshift('None');
-            console.log(employee);
 
             inquirer.prompt([
                 {
@@ -121,7 +120,7 @@ function addEmployee() {
                 }
             ])
                 .then((response) => {
-                    connection.query(`INSERT INTO role (id, first_name, last_name, role_id, manager_id) VALUES (0, '${response.first_name}', '${response.last_name}', '${response.role}', '${response.manager}');`, function (err, results) { });
+                    connection.query(`INSERT INTO employee (id, first_name, last_name, role_id, manager_id) VALUES (0, '${response.first_name}', '${response.last_name}', '${response.role}', '${response.manager}');`, function (err, results) { });
                     start();
                 });
         });
