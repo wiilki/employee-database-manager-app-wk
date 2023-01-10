@@ -130,16 +130,23 @@ function addRole(actions) {
 function addEmployee(userInput) {
     connection.query('SELECT * FROM role', function (err, results) {
         const roles = results;
-        connection.query('SELECT manager_id from employee', function (err, results) {
+        connection.query(`SELECT first_name FROM employee e LEFT JOIN employee m ON m.id = e.manager_id;`, function (err, results) {
             const managerID = results;
+            console.log(managerID)
 
-            for (i = 0; i < managerID.length; i++) {
-                if (managerID[i].manager_id !== null) {
-                    console.log(managerID[i].manager_id)
+
+
+            
+            function findManager() {
+                for (i = 0; i < managerID.length; i++) {
+                    if (managerID[i].manager_id !== null) {
+                        console.log(managerID[i].manager_id);
+                    }
+
                 }
-            }
+                }
 
-
+            
 
             inquirer
                 .prompt([
@@ -170,12 +177,7 @@ function addEmployee(userInput) {
                         name: 'manager',
                         message: "Who is the employee's manager",
                         // Return id and name values from departent selected
-                        choices: managerID.map((employee) => {
-                            return {
-                                name: employee.first_name + employee.last_name,
-                                value: employee.id
-                            }
-                        })
+                        choices: []
                     }
                 ])
                 .then((response) => {
