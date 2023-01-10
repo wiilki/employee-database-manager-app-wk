@@ -134,12 +134,12 @@ function addEmployee() {
     });
 };
 
-// Add employee role prompt
+// Update employee role prompt
 function updateRole() {
     console.log('UPDATE EMPLOYEE ROLE');
 
     connection.query('SELECT * FROM employee', function (err, results) {
-        // Returns all departments to an array
+        // Returns all employees to an array
         const employees = results.map(employee => ({ name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
 
         connection.query('SELECT * FROM role', function (err, results) {
@@ -161,7 +161,6 @@ function updateRole() {
                 }
             ])
                 .then((response) => {
-                    console.log(response)
                     connection.query(`UPDATE employee SET role_id = '${response.role}' WHERE id = ${response.employee};`, function (err, results) { });
                     start();
                 });
