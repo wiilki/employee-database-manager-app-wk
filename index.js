@@ -47,7 +47,6 @@ function addDepartment() {
     ])
         .then((response) => {
             connection.query(`INSERT INTO department (id, name) VALUES (0, '${response.name}');`, function (err, results) { });
-            connection.query('SELECT * FROM department;', function (err, results) { });
             start();
         });
 };
@@ -78,7 +77,6 @@ function addRole() {
         ])
             .then((response) => {
                 connection.query(`INSERT INTO role (id, title, salary, department_id) VALUES (0, '${response.title}', '${response.salary}', '${response.department}');`, function (err, results) { });
-                connection.query('SELECT * FROM department;', function (err, results) { });
                 start();
             });
     });
@@ -93,6 +91,8 @@ function addEmployee() {
         connection.query(`SELECT * FROM employee;`, function (err, results) {
 
             const employee = results.map(employee => ({ name: employee.first_name + ' ' + employee.last_name, value: employee.employee_id }));
+            employee.unshift('None');
+            console.log(employee);
 
             inquirer.prompt([
                 {
@@ -122,7 +122,6 @@ function addEmployee() {
             ])
                 .then((response) => {
                     connection.query(`INSERT INTO role (id, first_name, last_name, role_id, manager_id) VALUES (0, '${response.first_name}', '${response.last_name}', '${response.role}', '${response.manager}');`, function (err, results) { });
-                    connection.query('SELECT * FROM department;', function (err, results) { });
                     start();
                 });
         });
