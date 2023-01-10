@@ -35,6 +35,20 @@ function viewEmployees() {
     });
 };
 
+function viewByManager() {
+    connection.query("SELECT CONCAT(m.first_name, ' ', m.last_name) AS manager, e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary FROM employee e LEFT JOIN role r ON e.role_id = r.id LEFT JOIN department d ON d.id = r.department_id LEFT JOIN employee m ON m.id = e.manager_id WHERE e.manager_id IS NOT NULL ORDER BY e.manager_id;", function (err, results) {
+        console.table(results);
+        addEmployee();
+    });
+};
+
+function viewByDepartment() {
+    connection.query("SELECT d.name AS department, e.id, e.first_name, e.last_name, r.title, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager FROM employee e LEFT JOIN role r ON e.role_id = r.id LEFT JOIN department d ON d.id = r.department_id LEFT JOIN employee m ON m.id = e.manager_id;", function (err, results) {
+        console.table(results);
+        addEmployee();
+    });
+};
+
 // New department prompt
 function addDepartment() {
     inquirer.prompt([
@@ -208,11 +222,9 @@ function updateManager() {
     });
 };
 
-function viewByManager() {
-    connection.query("SELECT CONCAT(m.first_name, ' ', m.last_name) AS manager, e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary FROM employee e LEFT JOIN role r ON e.role_id = r.id LEFT JOIN department d ON d.id = r.department_id LEFT JOIN employee m ON m.id = e.manager_id WHERE e.manager_id IS NOT NULL ORDER BY e.manager_id;", function (err, results) {
-        console.table(results);
-        start();
-    });
+
+function deleteEmployee() {
+
 };
 
 function updateEmployee() {
@@ -221,7 +233,7 @@ function updateEmployee() {
             type: 'list',
             name: 'actions',
             message: 'What would you like to do?',
-            choices: ['Update Employee Role', 'Update Employee Manager', 'Go Back']
+            choices: ['Update Employee Role', 'Update Employee Manager', 'View Employee By Manager', 'View Employee By Department', 'Go Back']
         }
     ]).then(response => {
         switch (response.actions) {
@@ -230,6 +242,13 @@ function updateEmployee() {
                 break;
             case 'Update Employee Manager':
                 return updateManager(response);
+                break;
+            case 'View Employee By Manager':
+                return viewByManager(response);
+                break;
+
+            case 'View Employee By Department':
+                return viewByDepartment(response);
                 break;
             case 'Go Back':
                 return start();
@@ -246,16 +265,13 @@ function start() {
             type: 'list',
             name: 'actions',
             message: 'What would you like to do?',
-            choices: ['View All Employees', 'View By Manager', 'Add Employee', 'Update Employee', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Quit']
+            choices: ['View All Employees', 'Add Employee', 'Update Employee', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Quit']
         }
     ])
         .then(response => {
             switch (response.actions) {
                 case 'View All Employees':
                     return viewEmployees(response);
-                    break;
-                case 'View By Manager':
-                    return viewByManager(response);
                     break;
                 case 'Add Employee':
                     return addEmployee(response);
