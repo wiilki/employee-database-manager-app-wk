@@ -1,6 +1,5 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
-const promise = require('mysql2/promise');
 const consoleTable = require('console.table');
 
 const connection = mysql.createConnection(
@@ -55,6 +54,7 @@ function addDepartment() {
 function addRole() {
     connection.query('SELECT * FROM department', function (err, results) {
 
+        // Returns all departments to an array
         const departments = results.map(department => ({ name: department.name, value: department.id }));
 
         inquirer.prompt([
@@ -86,11 +86,14 @@ function addRole() {
 function addEmployee() {
     connection.query('SELECT * FROM role', function (err, results) {
 
+        // Returns all roles to an array
         const roles = results.map(role => ({ name: role.title, value: role.id }));
-
         connection.query(`SELECT * FROM employee;`, function (err, results) {
 
+            // Returns all employees to an array
             const employee = results.map(employee => ({ name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
+
+            // Adds "None" to top of manager selection
             employee.unshift('None');
 
             inquirer.prompt([
@@ -108,19 +111,23 @@ function addEmployee() {
                     type: 'list',
                     name: 'role',
                     message: "What is the employee's role?",
-                    // Return id and name values from departent selected
+                    // Return id and name values from role table
                     choices: roles
                 },
                 {
                     type: 'list',
                     name: 'manager',
                     message: "Who is the employee's manager",
-                    // Return id and name values from departent selected
+                    // Return id and name values from employee table
                     choices: employee
                 }
             ])
                 .then((response) => {
-                    connection.query(`INSERT INTO employee (id, first_name, last_name, role_id, manager_id) VALUES (0, '${response.first_name}', '${response.last_name}', '${response.role}', '${response.manager}');`, function (err, results) { });
+                    if (`${response.manager}` === "None") {
+                        connection.query(`INSERT INTO employee (id, first_name, last_name, role_id, manager_id) VALUES (0, '${response.first_name}', '${response.last_name}', '${response.role}', null);`, function (err, results) { });
+                    } else {
+                        connection.query(`INSERT INTO employee (id, first_name, last_name, role_id, manager_id) VALUES (0, '${response.first_name}', '${response.last_name}', '${response.role}', '${response.manager}');`, function (err, results) { });
+                    };
                     start();
                 });
         });
@@ -164,4 +171,4 @@ function start() {
         })
 }
 
-start()
+start();
