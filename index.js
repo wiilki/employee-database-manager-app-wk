@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const consoleTable = require('console.table');
+const banner = require('simple-banner').set("Employee Database Manager App");
 
 const connection = mysql.createConnection(
     {

@@ -182,3 +182,7 @@ You are required to submit BOTH of the following for review:
 
 - - -
 © 2022 edX Boot Camps LLC. Confidential and Proprietary. All Rights Reserved.
+
+## Credits
+
+* [Simple Banner](https://www.npmjs.com/package/simple-banner)
