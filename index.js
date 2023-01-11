@@ -46,8 +46,17 @@ function viewByManager() {
 // View employee's by departments
 function viewByDepartment() {
     connection.query("SELECT d.name AS department, e.id, e.first_name, e.last_name, r.title, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager FROM employee e LEFT JOIN role r ON e.role_id = r.id LEFT JOIN department d ON d.id = r.department_id LEFT JOIN employee m ON m.id = e.manager_id;", function (err, results) {
+        console.log
         console.table(results);
         updateEmployee();
+    });
+};
+
+// View utilized budget of departments
+function viewBudget() {
+    connection.query('SELECT d.name AS department, SUM(r.salary) AS budget FROM employee e LEFT JOIN role r ON e.role_id = r.id LEFT JOIN department d ON d.id = r.department_id LEFT JOIN employee m ON m.id = e.manager_id GROUP BY d.name;', function (err, results) {
+        console.table(results);
+        start();
     });
 };
 
@@ -322,6 +331,8 @@ function deleteEmployee() {
     });
 };
 
+
+// Update employee promopt
 function updateEmployee() {
     inquirer.prompt([
         {
@@ -363,7 +374,7 @@ function start() {
             type: 'list',
             name: 'actions',
             message: 'What would you like to do?',
-            choices: ['View All Employees', 'Add Employee', 'Update Employee', 'View All Roles', 'Add Role', 'Delete Role', 'View All Departments', 'Add Department', 'Delete Department', 'Quit']
+            choices: ['View All Employees', 'Add Employee', 'Update Employee', 'View All Roles', 'Add Role', 'Delete Role', 'View All Departments', 'View Department Utilized Budget', 'Add Department', 'Delete Department', 'Quit']
         }
     ])
         .then(response => {
@@ -388,6 +399,9 @@ function start() {
                     break;
                 case 'View All Departments':
                     return viewDepartments(response);
+                    break;
+                case 'View Department Utilized Budget':
+                    return viewBudget(response);
                     break;
                 case 'Add Department':
                     return addDepartment(response);
